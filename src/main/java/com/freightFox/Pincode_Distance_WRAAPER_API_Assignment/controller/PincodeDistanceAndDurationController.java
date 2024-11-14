@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api")
@@ -29,7 +30,29 @@ public class PincodeDistanceAndDurationController {
     public ResponseEntity<HttpApiResponse> getDistanceAndDuration(@RequestBody PincodeLocationDtos pincodeLocationDtos) throws CatchGlobalException {
        try{
 
-           PincodeLocationDtos savedlocation = pincodeLocationDistanceAndDurationServices.getDistanceAndDuration(pincodeLocationDtos);
+           boolean isPincodeAvailable=false;
+           if(!Objects.isNull(pincodeLocationDtos.getSourcePincode())
+                   && !Objects.isNull(pincodeLocationDtos.getDestinationPincode())){
+               isPincodeAvailable= (!pincodeLocationDtos.getSourcePincode().isBlank() && !pincodeLocationDtos.getDestinationPincode().isBlank());
+           }
+
+           boolean isCoordinatesDecimalAvailable=(!Objects.isNull(pincodeLocationDtos.getDestinationLatitude())
+                   && !Objects.isNull(pincodeLocationDtos.getDestinationLongitude())
+                   && !Objects.isNull(pincodeLocationDtos.getSourceLatitude())
+                   && !Objects.isNull(pincodeLocationDtos.getSourceLongitude()));
+
+           String origin = "";
+           String destination="";
+           if(isPincodeAvailable){
+               origin=pincodeLocationDtos.getSourcePincode().trim();
+               destination=pincodeLocationDtos.getDestinationPincode().trim();
+           }else {
+
+               origin = pincodeLocationDtos.getSourceLatitude()+","+pincodeLocationDtos.getSourceLongitude();
+               destination = pincodeLocationDtos.getDestinationLatitude()+","+pincodeLocationDtos.getDestinationLongitude();
+
+           }
+           PincodeLocationDtos savedlocation = pincodeLocationDistanceAndDurationServices.getDistanceAndDuration(pincodeLocationDtos,isPincodeAvailable,isCoordinatesDecimalAvailable,origin,destination);
            Map<String,PincodeLocationDtos> locationDtosMap = new HashMap<>();
            locationDtosMap.put("DistanceAndDuration",savedlocation);
            return new ResponseEntity<>(HttpApiResponse

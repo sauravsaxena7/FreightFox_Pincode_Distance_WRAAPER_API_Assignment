@@ -3,6 +3,7 @@ package com.freightFox.Pincode_Distance_WRAAPER_API_Assignment.dtos;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.locationtech.jts.geom.Geometry;
 
 import java.math.BigDecimal;
@@ -10,6 +11,7 @@ import java.math.BigInteger;
 
 @Builder
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 public class PincodeLocationDtos {
     

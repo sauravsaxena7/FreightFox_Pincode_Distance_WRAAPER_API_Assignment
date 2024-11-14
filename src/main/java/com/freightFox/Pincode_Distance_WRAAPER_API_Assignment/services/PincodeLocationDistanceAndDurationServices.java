@@ -11,6 +11,7 @@ import com.freightFox.Pincode_Distance_WRAAPER_API_Assignment.repos.PincodeLocat
 import com.freightFox.Pincode_Distance_WRAAPER_API_Assignment.response.HttpApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -45,18 +46,11 @@ public class PincodeLocationDistanceAndDurationServices {
     }
 
 
-    public PincodeLocationDtos getDistanceAndDuration(PincodeLocationDtos pincodeLocationReq) throws CatchGlobalException {
+    @Cacheable(value = "PincodeLocationDtos", key = "#origin + '-' + #destination")
+    public PincodeLocationDtos getDistanceAndDuration(PincodeLocationDtos pincodeLocationReq,boolean isPincodeAvailable
+            ,boolean isCoordinatesDecimalAvailable
+            ,String origin, String destination) throws CatchGlobalException {
 
-        boolean isPincodeAvailable=false;
-        if(!Objects.isNull(pincodeLocationReq.getSourcePincode())
-                && !Objects.isNull(pincodeLocationReq.getDestinationPincode())){
-           isPincodeAvailable= (!pincodeLocationReq.getSourcePincode().isBlank() && !pincodeLocationReq.getDestinationPincode().isBlank());
-        }
-
-        boolean isCoordinatesDecimalAvailable=(!Objects.isNull(pincodeLocationReq.getDestinationLatitude())
-                && !Objects.isNull(pincodeLocationReq.getDestinationLongitude())
-                && !Objects.isNull(pincodeLocationReq.getSourceLatitude())
-                && !Objects.isNull(pincodeLocationReq.getSourceLongitude()));
 
         if(!isCoordinatesDecimalAvailable && !isPincodeAvailable) throw new CatchGlobalException("Invalid Request, origin and destination pincode or Lat & long is not valid.", HttpStatus.BAD_REQUEST.toString(),HttpStatus.BAD_REQUEST.value());
 
@@ -93,17 +87,7 @@ public class PincodeLocationDistanceAndDurationServices {
             if (location.isPresent()) return mapper.toDTO(location.get());
         }
 
-        String origin = "";
-        String destination="";
-        if(isPincodeAvailable){
-            origin=pincodeLocationReq.getSourcePincode().trim();
-            destination=pincodeLocationReq.getDestinationPincode().trim();
-        }else {
 
-            origin = pincodeLocationReq.getSourceLatitude()+","+pincodeLocationReq.getSourceLongitude();
-            destination = pincodeLocationReq.getDestinationLatitude()+","+pincodeLocationReq.getDestinationLongitude();
-
-        }
 
         PincodeLocationDtos savedPinCode  = findDistanceAndDurationUsingGoogleApi(origin,destination,pincodeLocationReq);
 
@@ -113,6 +97,8 @@ public class PincodeLocationDistanceAndDurationServices {
 
     }
 
+
+    @Cacheable(value = "PincodeLocationDtos", key = "#origin + '-' + #destination")
     private PincodeLocationDtos findDistanceAndDurationUsingGoogleApi(String origin, String destination, PincodeLocationDtos pincodeLocationReq) throws CatchGlobalException {
 
         String url = GOOGLE_BASE_URL+"/maps/api/distancematrix/json?origins="
@@ -129,7 +115,7 @@ public class PincodeLocationDistanceAndDurationServices {
 
 
             assert distanceMatrixApiResponse != null;
-            System.out.println("GoogleDistanceMatrixApiResponse: "+distanceMatrixApiResponse);
+            System.out.println("GoogleDistanceMatrixApiResponse Calling: "+distanceMatrixApiResponse);
 
             DistanceMatrixRow row = distanceMatrixApiResponse.rows.get(0);
             DistanceMatrixElement element = row.elements.get(0);
