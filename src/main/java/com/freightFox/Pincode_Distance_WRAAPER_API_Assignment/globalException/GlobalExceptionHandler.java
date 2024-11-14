@@ -17,7 +17,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(CatchGlobalException.class)
     public ResponseEntity<HttpApiResponse> handleExceptions(CatchGlobalException ex, WebRequest webRequest) {
-        HttpApiResponse response = HttpApiResponse.getExceptionHttpApiResponse(ex.getErrorMessage(),ex.getData(),ex.getStatusCode(), ex.getError());
+        HttpApiResponse response = HttpApiResponse.getExceptionHttpApiResponse(ex.getErrorMessage(),null,ex.getStatusCode(), ex.getError());
         return new ResponseEntity<>(response, HttpStatusCode.valueOf(ex.getStatusCode()));
     }
 

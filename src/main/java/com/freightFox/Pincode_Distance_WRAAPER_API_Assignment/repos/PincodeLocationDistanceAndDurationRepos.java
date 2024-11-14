@@ -1,20 +1,34 @@
 package com.freightFox.Pincode_Distance_WRAAPER_API_Assignment.repos;
 
 import com.freightFox.Pincode_Distance_WRAAPER_API_Assignment.entities.PincodeLocation;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.util.Optional;
 
-public interface PincodeLocationDistanceAndDurationRepos extends CrudRepository<PincodeLocation,Long> {
+@Repository
+public interface PincodeLocationDistanceAndDurationRepos extends CrudRepository<PincodeLocation, Long> {
 
-    boolean existsBySourceAndDestinationPinCode(String sourcePincode, String destinationPincode);
+    // Find by source and destination pincode
+    boolean existsBySourcePincodeAndDestinationPincode(String sourcePincode, String destinationPincode);
 
-    Optional<PincodeLocation> findBySourceAndDestinationPinCode(String sourcePincode, String destinationPincode);
-
-    boolean existsBySourceAndDestinationLatAndLong(BigDecimal sourceLat, BigDecimal sourceLang, BigDecimal destinationLat, BigDecimal destinationLong);
-
-    Optional<PincodeLocation> findBySourceAndDestinationLatAndLong(BigDecimal sourceLat, BigDecimal sourceLang, BigDecimal destinationLat, BigDecimal destinationLong);
+    Optional<PincodeLocation> findBySourcePincodeAndDestinationPincode(String sourcePincode, String destinationPincode);
 
 
+    // Find by source and destination latitude/longitude
+    Optional<PincodeLocation> findBySourceLatitudeAndSourceLongitudeAndDestinationLatitudeAndDestinationLongitude(
+            BigDecimal sourceLatitude,
+            BigDecimal sourceLongitude,
+            BigDecimal destinationLatitude,
+            BigDecimal destinationLongitude
+    );
+
+    boolean existsBySourceLatitudeAndSourceLongitudeAndDestinationLatitudeAndDestinationLongitude(
+            BigDecimal sourceLatitude,
+            BigDecimal sourceLongitude,
+            BigDecimal destinationLatitude,
+            BigDecimal destinationLongitude
+    );
 }

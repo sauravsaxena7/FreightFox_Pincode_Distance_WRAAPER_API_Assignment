@@ -17,20 +17,13 @@ import java.math.BigInteger;
 @Builder
 @Data
 @Entity
-@Table(name = "pincode_locations",
-        uniqueConstraints = {@UniqueConstraint(columnNames = {"sourcePincode", "destinationPincode"})}
-        // Composite candidate key
-//        the combination of firstName and lastName is
-//        a candidate key for the Employee entity.
-//        Adding @UniqueConstraint(columnNames = {"sourcePincode", "destinationPincode"})
-//        ensures that each combination of sourcePincode and destinationPincode
-//        is unique across all rows.
-)
+@Table(name = "pincode_locations")
 public class PincodeLocation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long pincodesLocationId;
+
 
     private String sourcePincode;
 
@@ -48,7 +41,7 @@ public class PincodeLocation {
     @Column(precision = 11, scale = 8)
     private BigDecimal destinationLongitude;
 
-    @Column(nullable = false, precision = 4, scale = 2)
+    @Column(nullable = false, precision = 6, scale = 2)
     private BigDecimal distanceInKM;
 
     private BigInteger durationInMinutes;
